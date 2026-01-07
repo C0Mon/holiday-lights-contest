@@ -12,7 +12,7 @@ import numpy as np
 class SnakeAnimation(BaseAnimation):
     lightNumber = 500
     backgroundColour = [0, 0, 0]
-    def __init__(self, frameBuf, *, fps: Optional[int] = 30):
+    def __init__(self, frameBuf, *, fps: Optional[int] = 20):
         super().__init__(frameBuf, fps=fps)
         self.t = 0
         self.snake = Snake(self.lightNumber-1)
@@ -30,16 +30,16 @@ class SnakeAnimation(BaseAnimation):
         for i in range(len(self.frameBuf)):
             # Your animation logic here
             if i <= snakeRange[0] and i >= snakeRange[1]:
-                self.frameBuf[i] = self.snake.colour
+                self.frameBuf[i] = self.snake.getColour(i)
             elif i == self.apple.position:
-                self.frameBuf[self.apple.position] = self.apple.colour
+                self.frameBuf[self.apple.position] = self.apple.getColour()
             else:
                 self.frameBuf[i] = self.backgroundColour
         self.snake.move()
         self.t += 1
 
 class Snake:
-    colour = [0, 255, 0]
+    colours = [[255, 0, 0], [255, 255, 255]]
     def __init__(self, maxLength):
         self.maxLength = maxLength
         self.position = maxLength//2
@@ -75,15 +75,27 @@ class Snake:
         if self.forward:
             return self.position
         return self.position - self.length
+    
+    def getColour(self, position):
+        if (self.position - position) % 3 == 0:
+            return self.colours[0]
+        return self.colours[1]
 
 class Apple:
-    colour = [255, 0, 0]
+    colours = [[255, 0, 0], [255, 255, 255]]
     def __init__(self, spawnRange):
         self.spawnRange = spawnRange
+        self.eaten = 0
         self.spawn((spawnRange[0]//2, spawnRange[0]//2), True)
     
     def spawn(self, snakeRange, snakeForward):
+        self.eaten += 1
         if snakeForward:
             self.position = random.randint(snakeRange[0], self.spawnRange[0])
             return
         self.position = random.randint(self.spawnRange[1], snakeRange[1])
+
+    def getColour(self):
+        if self.eaten % 3 == 0:
+            return self.colours[0]
+        return self.colours[1]
