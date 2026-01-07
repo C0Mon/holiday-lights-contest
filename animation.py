@@ -21,6 +21,8 @@ class SnakeAnimation(BaseAnimation):
     def renderNextFrame(self):
         # Update self.frameBuf with RGB values (0-255)
         # frameBuf is a numpy array of shape (NUM_PIXELS, 3)
+        if self.snake.isFull():
+            self.reset()
         snakeRange = self.snake.getRange()
 
         if self.snake.getFront() == self.apple.position:
@@ -37,6 +39,10 @@ class SnakeAnimation(BaseAnimation):
                 self.frameBuf[i] = self.backgroundColour
         self.snake.move()
         self.t += 1
+    def reset(self):
+        self.t = 0
+        self.snake = Snake(self.lightNumber-1)
+        self.apple = Apple((self.lightNumber-1, 0))
 
 class Snake:
     colours = [[255, 0, 0], [255, 255, 255]]
